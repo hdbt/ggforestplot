@@ -135,6 +135,7 @@ forestplot <- function(df,
                        pvalue = NULL,
                        colour = NULL,
                        shape = NULL,
+                       alpha = NULL, # <--- CHANGE 1: ADD THIS
                        logodds = FALSE,
                        psignif = 0.05,
                        ci = 0.95,
@@ -154,6 +155,7 @@ forestplot <- function(df,
   pvalue <- enquo(pvalue)
   colour <- enquo(colour)
   shape <- enquo(shape)
+  alpha <- enquo(alpha) # <--- CHANGE 2: ADD THIS
   
   args <- list(...)
 
@@ -260,7 +262,8 @@ forestplot <- function(df,
         xmax = .data$.xmax,
         colour = !!colour,
         shape = !!shape,
-        filled = .data$.filled
+        filled = .data$.filled,
+        alpha = !!alpha # <--- CHANGE 3: ADD THIS
       ),
       position = ggstance::position_dodgev(height = 0.5)
     ) +
