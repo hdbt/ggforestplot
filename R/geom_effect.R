@@ -111,20 +111,29 @@ GeomEffect <- ggproto("GeomEffect", Geom,
 
   # TODO: check for the number of shapes?
 
-  draw_panel = function(data,
-                          panel_params,
-                          coord,
-                          fatten = 2) {
-    ggstance::GeomPointrangeh$draw_panel(
-      # @Ilari Indeed, the transform() is needed here for fatten to go through
-      transform(data, fatten = fatten) %>%
-        dplyr::mutate(
-          fill = dplyr::case_when(
-            is.na(.data$filled) ~ "#00000000",
-            !.data$filled ~ "white",
-            TRUE ~ .data$colour
-          )
+ draw_panel = function(data,
+                        panel_params,
+                        coord,
+                        fatten = 2) {
+
+    # This is the data that will be passed to the drawing function
+    data_to_draw <- transform(data, fatten = fatten) %>%
+      dplyr::mutate(
+        # Step 1: Determine the base fill color (same as before)
+        fill = dplyr::case_when(
+          is.na(.data$filled) ~ "#00000000",
+          !.data$filled ~ "white",
+          TRUE ~ .data$colour
         ),
+        
+        # Step 2 (THE FIX): Apply alpha to both the line/outline and the fill
+        # The .data$alpha comes directly from your aes(alpha = ...) mapping
+        colour = scales::alpha(.data$colour, .data$alpha),
+        fill = scales::alpha(.data$fill, .data$alpha)
+      )
+      
+    ggstance::GeomPointrangeh$draw_panel(
+      data_to_draw,
       panel_params,
       coord
     )
